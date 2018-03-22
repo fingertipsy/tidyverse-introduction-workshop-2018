@@ -1,10 +1,7 @@
----
-title: "tidyverse_pokemon"
-author: "Theresa Wege"
-date: "23 2 2018"
-output: html_document
----
+# Introduction to the tidyverse
+### principles of tidy data - the pipe operator - data manipulation with dplyr - using ggplot2
 
+#### What is this file we are working with?
 In this workshop we will work with an R markdown file. The main characteristic is that it allows us to have text and code in the same document.
 The code comes in so called "chunks", which typically represent one step of processing. We will have a seperate workshop on R markdown. For today you only need to know that you:
 - run code chunks by clicking on the green play button on the right
@@ -14,7 +11,7 @@ The code comes in so called "chunks", which typically represent one step of proc
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+#### Downloading and installing the tidyverse
 Before we can start using the tidyverse, we have to download and install the packages. A package is a set of functions and commands, that is an extension to base R. Everyone can develop a package and make it available to the community. All available packages are managed by CRAN = "The Comprehensive R Archive Network". 
 By executing the code below, you download and install the packages "tidyverse" and "ggplot2". 
 The tidyverse is in somehow a special package as it is a collection of packages, that are all considered to be the core of the tidyverse. It contains the packages readr, dplyr, tibble, magrittr (which we will use in this workshop) and a few more.
@@ -32,35 +29,39 @@ library(tidyverse)
 library(ggplot2)
 ```
 
+### Introduction to tidy data
 Before we start coding, let's get an idea of what tidy data is!
 
-Hadly Wickham: "Tidy datasets are easy to manipulate, model and visualize, and have a specific structure: each variable is a column, each observation is a row, and each type of observational unit is a table."
+> "Tidy datasets are easy to manipulate, model and visualize, and have a specific structure: each variable is a column, each observation is a row, and each type of observational unit is a table." - Hadley Wickham
 
 Let's take a look at some examples of tidy and untidy data: http://garrettgman.github.io/tidying/
 This website is also a great resouce to recap and expand on what you will learn in this workshop. 
 
-_______________________________________________________________________________________________________________
+![](http://garrettgman.github.io/images/tidy-4.png)
 
+
+### The Dataset
 Now let's start our own analysis!
 We will work with a cool pokemon dataset, which can be found here: https://www.kaggle.com/cadong/learning-r-s-dplyr-ggplot2-eda-with-pokemon/data
-This data set includes 721 Pokemon, including their number, name, first and second type, and basic stats: HP, Attack, Defense, Special Attack, Special Defense, and Speed. 
-This are the raw attributes that are used for calculating how much damage an attack will do in the games.
+This data set includes 721 Pokemon, their number, name, first and second type, and basic stats: HP, Attack, Defense, Special Attack, Special Defense, and Speed. 
+These are the raw attributes that are used for calculating how much damage an attack will do in the games.
 
-"#": ID for each pokemon
-Name: Name of each pokemon
-Type 1: Each pokemon has a type, this determines weakness/resistance to attacks
-Type 2: Some pokemon are dual type and have 2
-Total: sum of all stats that come after this, a general guide to how strong a pokemon is
-HP: hit points, or health, defines how much damage a pokemon can withstand before fainting
-Attack: the base modifier for normal attacks (eg. Scratch, Punch)
-Defense: the base damage resistance against normal attacks
-SP Atk: special attack, the base modifier for special attacks (e.g. fire blast, bubble beam)
-SP Def: the base damage resistance against special attacks
-Speed: determines which pokemon attacks first each round
+|Variable name | description |
+| ------------ |------------|
+|"#" | ID for each pokemon |
+|Name | Name of each pokemon |
+|Type 1 | Each pokemon has a type, this determines weakness/resistance to attacks |
+|Type 2 | Some pokemon are dual type and have 2 |
+|Total | sum of all stats that come after this, a general guide to how strong a pokemon is |
+|HP | hit points, or health, defines how much damage a pokemon can withstand before fainting |
+|Attack | the base modifier for normal attacks (eg. Scratch, Punch) |
+|Defense | the base damage resistance against normal attacks |
+|SP Atk | special attack, the base modifier for special attacks (e.g. fire blast, bubble beam) |
+|SP Def | the base damage resistance against special attacks |
+|Speed | determines which pokemon attacks first each round |
 
-Let's go and catch'em all!
+**Let's go and catch'em all!**
 
-_______________________________________________________________________________________________________________ 30min
 
 Loading the dataset
 
@@ -78,15 +79,13 @@ Because tibbles behave slightly differnt than dataframes, you might encounter a 
 pokemon <- read_csv('/Users/sctew/Desktop/pokemon dataset.txt')
 ```
 
-
-Carefully looking through the dataset. What is the format? Is this tidy data? Discuss! (5min)
-
-
+###tidying our dataset
+Carefully looking through the dataset. What is the format? Is this tidy data? Discuss!
 
 How about the variable names?
 They shouldn't be upper case or contain spaces. We want to change that. Run the code chunk below and compare the new tibble to the previous one by running "pokemon" again in the console or by double clicking on the item in your data environment. It will open a new tab containing a spreadsheet-like version of your data. Try to understand what each line of code did to the original dataset.
-What happens if you switch the two bits of code and run "names(pokemon) <- tolower(names(pokemon))" first? Can you explain what happened?
-What happens when you switch the code lines back? How can you fix the problem? (5min)
+- What happens if you switch the two bits of code and run "names(pokemon) <- tolower(names(pokemon))" first? Can you explain what happened?
+- What happens when you switch the code lines back? How can you fix the problem? (5min)
 
 ```{r}
 pokemon <-
@@ -102,15 +101,17 @@ names(pokemon) <- tolower(names(pokemon))
 ```
 
 
-First step: Look at the variables. There are a few variables that we might want to have as factor instead of character variables
+Now have a look at the variables. There are a few variables that we might want to have as factor instead of character variables
 -> factorize these variables
 
 ```{r}
 pokemon$generation <- factor(pokemon$generation, levels = c(1,2,3,4,5,6))
 ```
 
-Now it's your turn! Find more variables, that should be factors and transform them. Also try out what happens, when you don't specify the factor levels.
-The str function allows you to look at the structure of your variables. You might be familiar with the Variable viewer in SPSS, which is similar. Look at the structure and the differences between integer variables and factor variables. (5min)
+Now it's your turn! 
+- Find more variables, that should be factors and transform them. Also try out what happens, when you don't specify the factor levels.
+The str function allows you to look at the structure of your variables. You might be familiar with the Variable viewer in SPSS, which is similar. 
+- Look at the structure and the differences between integer variables and factor variables. (5min)
 
 ```{r}
 # pokemon$type1 <- factor(pokemon$type1)
