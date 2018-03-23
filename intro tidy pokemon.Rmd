@@ -17,6 +17,8 @@ By executing the code below, you download and install the packages "tidyverse" a
 The tidyverse is in somehow a special package as it is a collection of packages, that are all considered to be the core of the tidyverse. It contains the packages readr, dplyr, tibble, magrittr (which we will use in this workshop) and a few more.
 ggplot2 is also contained in the tidyverse, so with the code below we are actually installing it twice. I only use it as an example on how to download a single package of the tidyverse here. Although, ggplot2 works amazingly with the rest of the tidyverse, it is also very commonly used with all other kinds of workflows, as it is the state-of-the-art for producing beautiful and informative plots.
 
+![](https://www.rstudio.com/wp-content/uploads/2014/04/tidyverse-200x231.png) ![](https://www.rstudio.com/wp-content/uploads/2014/04/dplyr-200x232.png) ![](https://www.rstudio.com/wp-content/uploads/2014/04/ggplot2-200x232.png)
+
 ```{r}
 install.packages('tidyverse')
 install.packages('ggplot2')
@@ -43,8 +45,11 @@ This website is also a great resouce to recap and expand on what you will learn 
 ### The Dataset
 Now let's start our own analysis!
 We will work with a cool pokemon dataset, which can be found here: https://www.kaggle.com/cadong/learning-r-s-dplyr-ggplot2-eda-with-pokemon/data
+
 This data set includes 721 Pokemon, their number, name, first and second type, and basic stats: HP, Attack, Defense, Special Attack, Special Defense, and Speed. 
 These are the raw attributes that are used for calculating how much damage an attack will do in the games.
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pokémon_logo.svg/2000px-International_Pokémon_logo.svg.png)
 
 |Variable name | description |
 | ------------ |------------|
@@ -63,23 +68,25 @@ These are the raw attributes that are used for calculating how much damage an at
 **Let's go and catch'em all!**
 
 
-Loading the dataset
+### Loading the dataset
 
 Here you have two options: 
 - you can use the button "import dataset" in your environment
 OR
 - directly write a line of code that assigns your datafile to a variable using the readr package of the tidyverse. 
 
-when you use the tidyverse commands to load a dataset there are two main things to remember: 
-- base R gives you a dataframe, wheras the tidyverse works with tibbles. The idea behind the tibble is that it is a lighter and smarter version of a dataframe. You can take a look at your tibble by typing in its name in the console and pressing return. 
-Because tibbles behave slightly differnt than dataframes, you might encounter a special function that expects a dataframe. You can always turn a tibble back into a dataframe by using as.data.frame(data)
-- especially for large datasets the tidyverse option of importing data gives you some advantages, mostly because its performance is faster
-
 ```{r}
 pokemon <- read_csv('/Users/sctew/Desktop/pokemon dataset.txt')
 ```
 
-###tidying our dataset
+when you use the tidyverse commands to load a dataset there are two main things to remember: 
+- base R gives you a dataframe, wheras the tidyverse works with tibbles. The idea behind the tibble is that it is a lighter and smarter version of a dataframe. You can take a look at your tibble by typing in its name in the console and pressing return. 
+Because tibbles behave slightly differnt than dataframes, you might at some point in the future encounter a special function that expects a dataframe. You can always turn a tibble back into a dataframe by using as.data.frame(data)
+- especially for large datasets the tidyverse option of importing data gives you some advantages, mostly because its performance is faster
+
+
+
+### Tidying our dataset
 Carefully looking through the dataset. What is the format? Is this tidy data? Discuss!
 
 How about the variable names?
@@ -101,27 +108,28 @@ names(pokemon) <- tolower(names(pokemon))
 ```
 
 
-Now have a look at the variables. There are a few variables that we might want to have as factor instead of character variables
--> factorize these variables
+Now have a look at the variables. There are a few variables that we might want to have as factor instead of character variables. A factor variable has different categories in which it could be diveded up. A character variable doesn't have this categorization and the values are just treated as words (or rather chains of letters) instead of meaningful categories.
+Below you can see how we can turn a variable into a factor.
 
 ```{r}
 pokemon$generation <- factor(pokemon$generation, levels = c(1,2,3,4,5,6))
 ```
 
 Now it's your turn! 
-- Find more variables, that should be factors and transform them. Also try out what happens, when you don't specify the factor levels.
-The str function allows you to look at the structure of your variables. You might be familiar with the Variable viewer in SPSS, which is similar. 
+This excersise is a recap of the introduction to R session and an easy practice to get a feeling for the code again before we start with the new content
+- Find more variables, that should be factors and transform them. Also try out what happens when you don't specify the factor levels.
+The str function allows you to look at the structure of your variables. You might be familiar with the variable viewer in SPSS, which is similar. 
 - Look at the structure and the differences between integer variables and factor variables. (5min)
 
 ```{r}
-# pokemon$type1 <- factor(pokemon$type1)
+# pokemon$type1 <- factor(pokemon$type1) #we will transform them later, so it's not necessary to have them factorized
 # pokemon$type2 <- factor(pokemon$type2)
-# we will gather these later, so it doesn't make sense to factorize now
+
 pokemon$legendary <- factor(pokemon$legendary)
 str(pokemon)
 ```
 
-Our data doesn't have a very nice long format. In the next step we will reshape our data into a better long format. First, take a look at our data set: Which variables should be gathered to make the data less wide and give us one observation/row? Take a piece of paper and draw how the final long data set should look like. Which variables will we have and which values do they take? Discuss this with your neighbour or as a group.
+Our data doesn't have a very nice long format. In the next step we will reshape our data into a better long format. First, take a look at our data set: Which variables should be gathered to make the data less wide and give us one observation/row? - Take a piece of paper and draw how the final long data set should look like. Which variables will we have and which values do they take? Discuss this with your neighbour or as a group.
 
 We want to gather the pokemon type. This is like a repeated measurment variable (each pokemon can have two types). We want one new variable, that tells us the level of measurment (primary or secondary type) and then one variable that gives us the result, here the type (fire, water, bug, dragon etc.).
 
@@ -136,7 +144,10 @@ print(pokemon)
 print(pokemon_long)
 ```
 
+### The pipe operator
 This is a perfect moment to introduce one of the great features of the tidyverse - the pipe %>%. 
+
+![](https://www.rstudio.com/wp-content/uploads/2014/04/magrittr-200x232.png)
 
 The pipe operator allows you to build a pipeline of different operations and pipe your data through it. To understand this you can imagine baking bread. If you do it by hand you will go through different steps that all lead you to an interim result, which you use for the next step: you mix the ingredients and get dough -> you put it in a form and let it grow -> you shape it -> you put the shaped dough and the oven and bake it.
 Wouldn't it be great to just put the ingredients in a machine and you take the ready baked bread out? You won't be bothered with the interim results.
@@ -145,7 +156,7 @@ This is basically what the pipe operator does to your code. You put an object li
 Take a look at how the code from above looks like, when we use the pipe. You understand the pipe operator when you can explain what the two print functions do and why we get again both datasets (pokemon and pokemon_long) although the print commands are empty. (10min)
 
 ```{r}
-pokemon_long <- #this is our final result
+pokemon_long <- #this will be where we store the final result
   pokemon %>% #the pokemon dataset is the ingedients we use
   print() %>% #we apply this procedure
   gather("type_priority", "type", type1:type2) %>% #we take the result from the previous procedure and apply this
@@ -156,9 +167,10 @@ pokemon_long <- #this is our final result
 Remember that "chaining" means that you invoke multiple method calls. As each method returns an object, you can actually allow the calls to be chained together in a single statement, without needing variables to store the intermediate results.
 
 
-No it's your turn: Try to gather all the stats for the pokemon into two variables: the type of stats (attack, defense...) and the value. 
+No it's your turn: 
+- Try to gather all the stats for the pokemon into two variables: the type of stats (attack, defense...) and the value. 
 Try to use the pipe operator!
-If this is easy for you try to combine the previous code chunk and this one and make one single pipeline (10min)
+- If this is easy for you try to combine the previous code chunk and this one and make one single pipeline (10min)
 
 ```{r}
 # pokemon_long <- gather(pokemon_long, "stats_type", "stats_value", total:speed)
@@ -179,12 +191,14 @@ pokemon_long <-
     
 ```
 
+### Summarise data
 So why did we do all of this?
-
 We can now make beautiful data summaries and graphs!
 
 We can now find out which pokemon type is the mightiest. To do so, we summarise our data set.
 For the summary we use the pipe operator and functions from the dplyr package. To understand what each of these functions does, take a look at the dplyr cheatsheet. I've printed out copies, but you can also always find it in the help menu -> cheatsheets -> data Transformation with dplyr
+
+![](https://image.slidesharecdn.com/data-wrangling-cheatsheet-160705210122/95/data-wrangling-with-dplyr-and-tidyr-cheat-sheet-1-638.jpg?cb=1467752577)
 
 Look at the code chunk and try to understand the single transformations we pipe our data through. It will help you to understand what each line of code does when you look at how the result changes when you disable that step. You can do that by turning the line into a comment. A comment is text within your code, but it is ignored when your code is executed. You can turn text into comments by putting a # in front of it. (10min)
 
