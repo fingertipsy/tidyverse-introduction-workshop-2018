@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 #### Downloading and installing the tidyverse
 Before we can start using the tidyverse, we have to download and install the packages. A package is a set of functions and commands, that is an extension to base R. Everyone can develop a package and make it available to the community. All available packages are managed by CRAN = "The Comprehensive R Archive Network". 
+
 By executing the code below, you download and install the packages "tidyverse" and "ggplot2". 
 The tidyverse is in somehow a special package as it is a collection of packages, that are all considered to be the core of the tidyverse. It contains the packages readr, dplyr, tibble, magrittr (which we will use in this workshop) and a few more.
 ggplot2 is also contained in the tidyverse, so with the code below we are actually installing it twice. I only use it as an example on how to download a single package of the tidyverse here. Although, ggplot2 works amazingly with the rest of the tidyverse, it is also very commonly used with all other kinds of workflows, as it is the state-of-the-art for producing beautiful and informative plots.
@@ -37,14 +38,14 @@ Before we start coding, let's get an idea of what tidy data is!
 > "Tidy datasets are easy to manipulate, model and visualize, and have a specific structure: each variable is a column, each observation is a row, and each type of observational unit is a table." - Hadley Wickham
 
 Let's take a look at some examples of tidy and untidy data: http://garrettgman.github.io/tidying/
-This website is also a great resouce to recap and expand on what you will learn in this workshop. 
+This website is also a great resource to recap and expand on what you will learn in this workshop. 
 
 ![](http://garrettgman.github.io/images/tidy-4.png)
 
 
 ### The Dataset
 Now let's start our own analysis!
-We will work with a cool pokemon dataset, which can be found here: https://www.kaggle.com/cadong/learning-r-s-dplyr-ggplot2-eda-with-pokemon/data
+We will work with a fun pokemon dataset, which can be found here: https://www.kaggle.com/cadong/learning-r-s-dplyr-ggplot2-eda-with-pokemon/data
 
 This data set includes 721 Pokemon, their number, name, first and second type, and basic stats: HP, Attack, Defense, Special Attack, Special Defense, and Speed. 
 These are the raw attributes that are used for calculating how much damage an attack will do in the games.
@@ -92,7 +93,8 @@ Carefully looking through the dataset. What is the format? Is this tidy data? Di
 How about the variable names?
 They shouldn't be upper case or contain spaces. We want to change that. Run the code chunk below and compare the new tibble to the previous one by running "pokemon" again in the console or by double clicking on the item in your data environment. It will open a new tab containing a spreadsheet-like version of your data. Try to understand what each line of code did to the original dataset.
 - What happens if you switch the two bits of code and run "names(pokemon) <- tolower(names(pokemon))" first? Can you explain what happened?
-- What happens when you switch the code lines back? How can you fix the problem? (5min)
+- What happens when you switch the code lines back? How can you fix the problem? 
+(8min)
 
 ```{r}
 pokemon <-
@@ -119,7 +121,7 @@ Now it's your turn!
 This excersise is a recap of the introduction to R session and an easy practice to get a feeling for the code again before we start with the new content
 - Find more variables, that should be factors and transform them. Also try out what happens when you don't specify the factor levels.
 The str function allows you to look at the structure of your variables. You might be familiar with the variable viewer in SPSS, which is similar. 
-- Look at the structure and the differences between integer variables and factor variables. (5min)
+- Look at the structure and the differences between integer variables and factor variables. (8min)
 
 ```{r}
 # pokemon$type1 <- factor(pokemon$type1) #we will transform them later, so it's not necessary to have them factorized
@@ -129,14 +131,17 @@ pokemon$legendary <- factor(pokemon$legendary)
 str(pokemon)
 ```
 
-Our data doesn't have a very nice long format. In the next step we will reshape our data into a better long format. First, take a look at our data set: Which variables should be gathered to make the data less wide and give us one observation/row? - Take a piece of paper and draw how the final long data set should look like. Which variables will we have and which values do they take? Discuss this with your neighbour or as a group.
+Tidy data comes in a long format (remember: "each observation is a row"). The opposite is a wide format where each row is a case, which might be what you know from SPSS. Our data doesn't have a very nice long format. In the next step we will reshape our data into a better long format. 
+- First, take a look at our data set: Which variables should be gathered to make the data less wide and give us one observation/row? 
+- Take a piece of paper and draw how the final long data set should look like. Which variables will we have and which values do they take? Discuss this with your neighbour or as a group.
+(10min)
 
 We want to gather the pokemon type. This is like a repeated measurment variable (each pokemon can have two types). We want one new variable, that tells us the level of measurment (primary or secondary type) and then one variable that gives us the result, here the type (fire, water, bug, dragon etc.).
 
 To do that we use the gather function. We tell it that we want the new variables "type_priority" which will contain the current variables names (type1 and type2) and the new variable "type" which will contain the value that our current variables take (fire, water, bug, dragon etc.). 
 We need to specify which variables should be gathered. Here we say we want everything between and including type1 and type2, which is indicated by the ":" 
 
-Compare the datasets "pokemon" and "pokemon_long" by looking at the tibbles we printed.
+- Compare the datasets "pokemon" and "pokemon_long" by looking at the tibbles we printed.
 
 ```{r}
 pokemon_long <- gather(pokemon, "type_priority", "type", type1:type2)
@@ -149,11 +154,14 @@ This is a perfect moment to introduce one of the great features of the tidyverse
 
 ![](https://www.rstudio.com/wp-content/uploads/2014/04/magrittr-200x232.png)
 
-The pipe operator allows you to build a pipeline of different operations and pipe your data through it. To understand this you can imagine baking bread. If you do it by hand you will go through different steps that all lead you to an interim result, which you use for the next step: you mix the ingredients and get dough -> you put it in a form and let it grow -> you shape it -> you put the shaped dough and the oven and bake it.
+The pipe operator allows you to build a pipeline of different operations and pipe your data through it. To understand this you can imagine baking bread. If you do it by hand you will go through different steps that all lead you to an interim result, which you use for the next step: you mix the ingredients and get dough -> you put the dough in a form and let it grow -> you shape the grown dough -> you put the shaped dough and the oven and bake it -> you take the bread out.
+
 Wouldn't it be great to just put the ingredients in a machine and you take the ready baked bread out? You won't be bothered with the interim results.
 This is basically what the pipe operator does to your code. You put an object like a dataset in and all the functions will be applied in order, but no intermin results are stored and the output is your final result.
 
-Take a look at how the code from above looks like, when we use the pipe. You understand the pipe operator when you can explain what the two print functions do and why we get again both datasets (pokemon and pokemon_long) although the print commands are empty. (10min)
+- Below you can see the operation we did before written with the pipe. Take a look at how the code from above looks like, when we use the pipe. 
+- You understand the pipe operator when you can explain what the two print functions do and why we get again both datasets (pokemon and pokemon_long) although the print commands are empty. 
+(8min)
 
 ```{r}
 pokemon_long <- #this will be where we store the final result
@@ -163,14 +171,13 @@ pokemon_long <- #this will be where we store the final result
   print() #again we take the result from the previous procedure and print it
 ```
 
-
 Remember that "chaining" means that you invoke multiple method calls. As each method returns an object, you can actually allow the calls to be chained together in a single statement, without needing variables to store the intermediate results.
-
 
 No it's your turn: 
 - Try to gather all the stats for the pokemon into two variables: the type of stats (attack, defense...) and the value. 
 Try to use the pipe operator!
-- If this is easy for you try to combine the previous code chunk and this one and make one single pipeline (10min)
+- If this is easy for you try to combine the previous code chunk and this one and make one single pipeline 
+(10min)
 
 ```{r}
 # pokemon_long <- gather(pokemon_long, "stats_type", "stats_value", total:speed)
@@ -181,6 +188,7 @@ pokemon_long <-
   gather("stats_type", "stats_value", total:speed) %>%
   print()
 
+# This is what all operations look like when chained together with the pipe
 # pokemon_long <- 
    # pokemon %>% 
     # print() %>% 
@@ -195,12 +203,14 @@ pokemon_long <-
 So why did we do all of this?
 We can now make beautiful data summaries and graphs!
 
-We can now find out which pokemon type is the mightiest. To do so, we summarise our data set.
+We can now for instance find out which pokemon type is the mightiest. To do so, we summarise our data set.
 For the summary we use the pipe operator and functions from the dplyr package. To understand what each of these functions does, take a look at the dplyr cheatsheet. I've printed out copies, but you can also always find it in the help menu -> cheatsheets -> data Transformation with dplyr
 
 ![](https://image.slidesharecdn.com/data-wrangling-cheatsheet-160705210122/95/data-wrangling-with-dplyr-and-tidyr-cheat-sheet-1-638.jpg?cb=1467752577)
 
-Look at the code chunk and try to understand the single transformations we pipe our data through. It will help you to understand what each line of code does when you look at how the result changes when you disable that step. You can do that by turning the line into a comment. A comment is text within your code, but it is ignored when your code is executed. You can turn text into comments by putting a # in front of it. (10min)
+- Look at the code chunk and try to understand the single transformations we pipe our data through. 
+- It will help you to understand what each line of code does when you look at how the result changes when you disable that step. You can do that by turning the line into a comment. A comment is text within your code, but it is ignored when your code is executed. You can turn text into comments by putting a # in front of it. 
+(10min)
 
 ```{r}
 mighty_types <- 
@@ -211,18 +221,19 @@ mighty_types <-
   print()
 ```
 
-We now have a nice new summary dataset. It is a much better overwiev than the original dataset and allows us to easily compare pokemon types regarding their total strenght.
+We now have a nice new summary dataset. It is a much better overview than the original dataset and allows us to easily compare pokemon types regarding their total strenght.
 
-Can you produce a new dataset, that compares the average values for all stats except "total" for legendary and non-legendary pokemon?
+- Can you produce a new dataset, that compares the average values for all stats except "total" for legendary and non-legendary pokemon? The code chunk below can do the trick. Try to fill in the blanks and make it work 
+(10min)
 
-The code chunk below can do the trick. Try to fill in the blanks and make it work (10min)
-
+``` {r}
 legendary_types <-
-  pokemon_long _____
-  ________ (stats_type _____ "total") %>%
+  pokemon_long _____ 
+  ________ (stats_type _____ "total") %>% 
   group_by( _________ , stats_type) %>%
   summarise(mean( ________)) %>%
   print( _____)
+```
 
 ```{r}
 legendary_types <-
@@ -233,8 +244,7 @@ legendary_types <-
   print()
 ```
 
-
-With some tidyverse magic we could make great new tibbles that give us a fantastic overview of the data we are interested in when we want to answer a specific question. Although our tibbles are beautifully arranged and ordered and we can even sort variables, when opening then in a new tab, it's still doesn't allow us to get a feeling for out data within seconds. 
+With some tidyverse magic we could make great new tibbles that give us a fantastic overview of the data we are interested in when we want to answer a specific question. Although our tibbles are beautifully arranged and ordered and we can even sort variables it still doesn't allow us to get a feeling for out data within seconds. 
 
 That's why we might also want to plot this data for an even better overview. We don't use the summarise function and the mean here though, because we are also interested to see the variation in strenght.
 Here I plotted six selected types of pokemon and their total stats in a violin plot using the tidyverse package ggplot2. We will have an extra session on ggplot2, but note that it works perfectly together with the pipe.
@@ -252,8 +262,10 @@ pokemon_long %>%
 
 With only these few simple commands, we can already do most of our descriptive statistics. 
 
-We now want to do a violin plot, that compares the different statistics between legendary and non-legendary pokemon. Below you can see the code-chunk, that produces the plot. Try to fill in the blanks and make it work! (10min)
+- We now want to do a violin plot, that compares the different statistics between legendary and non-legendary pokemon. Below you can see the code-chunk, that produces the plot. Try to fill in the blanks and make it work! 
+(8min)
 
+```{r}
 ______________ %>%
   group_by( ____________, stats_type) %>%
   _________(stats_value) %>%
@@ -261,6 +273,7 @@ ______________ %>%
   ggplot(aes(stats_type, ___________, fill=legendary)) +
     geom_violin(draw_quantiles = 0.5) +
     theme_classic()
+```
 
 ```{r}
 pokemon_long %>%
@@ -271,10 +284,12 @@ pokemon_long %>%
     geom_violin(alpha=0.5, draw_quantiles = 0.5) +
     theme_classic()
 ```
+
+In this workshop you learned about tidy data and how to transform a dataset with some simple tools. You also learned how to chain several lines of code by using the pipe. We have transformed and summarised our dataset and used the results to create informative tables and plots. 
+I hope you enjoyed this workshop. Please feel free to contact me with any questions. 
+
+This "introduction to the tidyverse" was created by Theresa Elise Wege in Feb 18 using the "pokemon with stats" dataset, shared by Alberto Barradas on kaggle.com https://www.kaggle.com/abcsds/pokemon.
+Parts of this workshop are insired by Chris Dong's kernel "Learning R's dplyr, ggplot2, EDA with Pokemon!!" on kaggle.com
+https://www.kaggle.com/cadong/learning-r-s-dplyr-ggplot2-eda-with-pokemon
   
-  This "introduction to the tidyverse" was created by Theresa Elise Wege in Feb 18 using the "pokemon with stats" dataset, shared by Alberto Barradas on kaggle.com
-  https://www.kaggle.com/abcsds/pokemon.
-  Parts of this workshop are insired by Chris Dong's kernel "Learning R's dplyr, ggplot2, EDA with Pokemon!!" on kaggle.com
-  https://www.kaggle.com/cadong/learning-r-s-dplyr-ggplot2-eda-with-pokemon
-  
-  This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
