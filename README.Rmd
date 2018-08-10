@@ -1,8 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 # Introduction to the tidyverse
 ### principles of tidy data - the pipe operator - data manipulation with dplyr - using ggplot2
 
@@ -26,8 +21,8 @@ ggplot2 is also contained in the tidyverse, so with the code below we are actual
 ![](https://www.rstudio.com/wp-content/uploads/2014/04/tidyverse-200x231.png) ![](https://www.rstudio.com/wp-content/uploads/2014/04/dplyr-200x232.png) ![](https://www.rstudio.com/wp-content/uploads/2014/04/ggplot2-200x232.png)
 
 ```{r}
-#install.packages('tidyverse')
-#install.packages('ggplot2')
+install.packages('tidyverse')
+install.packages('ggplot2')
 ```
 
 Installed packages are available to all your R projects. You only need to install a package once and it will be in your library. However, you need to load packages you want to work with from your library for every R project.
@@ -35,7 +30,6 @@ Installed packages are available to all your R projects. You only need to instal
 ```{r}
 library(tidyverse)
 library(ggplot2)
-library(knitr)
 ```
 
 ### Introduction to tidy data
@@ -137,9 +131,7 @@ pokemon$legendary <- factor(pokemon$legendary)
 str(pokemon)
 ```
 
-Tidy data comes in a long format (remember: "each observation is a row"). The opposite is a wide format where each row is a case, which might be what you know from SPSS. Our data doesn't have a very nice long format. In the next step we will reshape our data into a more long format. 
-Note that how you define what counts as one observation might depend on the questions you're trying to answer with the data. It makes sense that each individual pokemon is an observation, but we could also be interested in other entities which are currently spread out in the same row.
-
+Tidy data comes in a long format (remember: "each observation is a row"). The opposite is a wide format where each row is a case, which might be what you know from SPSS. Depending on what you plan to do with your data, you might want to switch between long and wide formats. It all depends on what you define to be an observation. For this workshop, let's try our reshaping wide data into a long format. Our data doesn't have a very nice long format. In the next step we will reshape our data into a better long format. 
 - First, take a look at our data set: Which variables should be gathered to make the data less wide and give us one observation/row? 
 - Take a piece of paper and draw how the final long data set should look like. Which variables will we have and which values do they take? Discuss this with your neighbour or as a group.
 (10min)
@@ -234,14 +226,14 @@ We now have a nice new summary dataset. It is a much better overview than the or
 - Can you produce a new dataset, that compares the average values for all stats except "total" for legendary and non-legendary pokemon? The code chunk below can do the trick. Try to fill in the blanks and make it work 
 (10min)
 
-
+``` {r}
 legendary_types <-
   pokemon_long _____ 
   ________ (stats_type _____ "total") %>% 
   group_by( _________ , stats_type) %>%
   summarise(mean( ________)) %>%
   print( _____)
-  
+```
 
 ```{r}
 legendary_types <-
@@ -273,7 +265,7 @@ With only these few simple commands, we can already do most of our descriptive s
 - We now want to do a violin plot, that compares the different statistics between legendary and non-legendary pokemon. Below you can see the code-chunk, that produces the plot. Try to fill in the blanks and make it work! 
 (8min)
 
-
+```{r}
 ______________ %>%
   group_by( ____________, stats_type) %>%
   _________(stats_value) %>%
@@ -281,7 +273,7 @@ ______________ %>%
   ggplot(aes(stats_type, ___________, fill=legendary)) +
     geom_violin(draw_quantiles = 0.5) +
     theme_classic()
-
+```
 
 ```{r}
 pokemon_long %>%
